@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Fingerprint Auth Demo App</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-card>
+      <ion-card-header>
+          <h1 style="text-align: center">Welcome {{ data.name }}</h1>
+      </ion-card-header>
+      <ion-card-content>
+        You have arrived at the future!
+      </ion-card-content>
+    </ion-card>
+
+    <br>
+
+    <ion-card>
+        <ion-card-header>
+         Features
+        </ion-card-header>
+      
+        <ion-list>
+          <button ion-item (click)="gotToPage(1)">
+            <ion-icon name="md-globe" item-start></ion-icon>
+            World Transfers
+          </button>
+      
+        </ion-list>
+      </ion-card>
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+      <ion-title>Demo 2018.</ion-title>
+    </ion-toolbar>
+  </ion-footer>
+
+

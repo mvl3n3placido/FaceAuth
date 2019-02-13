@@ -1,0 +1,26 @@
+{
+    "logs": [
+        {
+            "outputFile": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-da\\values-da.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values-da\\fpauth-strings.xml",
+                    "from": {
+                        "startLines": "4,2,6,7,8,5,9,3,10,11",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "174,55,297,387,443,251,537,111,607,752",
+                        "endColumns": "76,55,89,55,93,45,69,62,144,83",
+                        "endOffsets": "246,106,382,438,532,292,602,169,747,831"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,132,188,278,334,428,474,544,607,752",
+                        "endColumns": "76,55,89,55,93,45,69,62,144,83",
+                        "endOffsets": "127,183,273,329,423,469,539,602,747,831"
+                    }
+                }
+            ]
+        }
+    ]
+}
