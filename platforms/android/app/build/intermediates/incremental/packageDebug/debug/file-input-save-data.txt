@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Wed Feb 13 14:41:55 SGT 2019
+#Wed Feb 13 15:20:16 SGT 2019
 56.path=www/assets/fonts/ionicons.eot
 5.base=D\:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\assets\\debug
 42.base=D\:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\assets\\debug

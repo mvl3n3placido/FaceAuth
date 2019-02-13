@@ -60,7 +60,7 @@ export class LoginpagePage {
       allowEdit: true,
       sourceType: 1,
       correctOrientation: false,
-      cameraDirection: 1
+      cameraDirection: this.camera.Direction.FRONT
     };
   }
 
@@ -92,7 +92,6 @@ export class LoginpagePage {
   }
 
   analyzePhoto(image: string) {
-    debugger;
     image = image.substring(image.indexOf('base64,') + 'base64,'.length);
     this.service.sendImageToImgur(image).subscribe((imgurRes) => {
       this.loading = false;
@@ -109,13 +108,12 @@ export class LoginpagePage {
         if (!sessionStorage.getItem('faceId1')) {
           sessionStorage.setItem('faceId1', azure[0].faceId);
           this.utility.presentAlert('Register Succesful');
-          return;
+          this.navigateToDashBoard();
         }
         const faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
         this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(verifyRes => {
           if (verifyRes.isIdentical) {
-            this.setAndGet.UserName = this.data.userName;
-            this.navCtrl.setRoot('DashboardPage');
+            this.navigateToDashBoard();
           }
         });
       }, (err) => {
@@ -131,14 +129,24 @@ export class LoginpagePage {
   }
 
   register() {
+    if (!this.data.userName) {
+      this.utility.presentAlert("Please enter Username!");
+      return;
+    }
     this.analyzeFace();
   }
   verifyIfFirstTimeLogin() {
     if (!sessionStorage.getItem('faceId1')) {
       this.utility.presentAlert('User not found.');
-    } else {;
+    } else {
+      ;
       this.analyzeFace();
     }
-
   }
+
+  navigateToDashBoard() {
+    this.setAndGet.UserName = this.data.userName;
+    this.navCtrl.setRoot('DashboardPage');
+  }
+
 }

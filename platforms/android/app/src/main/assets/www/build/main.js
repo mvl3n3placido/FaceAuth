@@ -74,7 +74,7 @@ var LoginpagePage = /** @class */ (function () {
             allowEdit: true,
             sourceType: 1,
             correctOrientation: false,
-            cameraDirection: 1
+            cameraDirection: this.camera.Direction.FRONT
         };
     };
     LoginpagePage.prototype.analyzeFace = function () {
@@ -103,7 +103,6 @@ var LoginpagePage = /** @class */ (function () {
     };
     LoginpagePage.prototype.analyzePhoto = function (image) {
         var _this = this;
-        debugger;
         image = image.substring(image.indexOf('base64,') + 'base64,'.length);
         this.service.sendImageToImgur(image).subscribe(function (imgurRes) {
             _this.loading = false;
@@ -120,13 +119,12 @@ var LoginpagePage = /** @class */ (function () {
                 if (!sessionStorage.getItem('faceId1')) {
                     sessionStorage.setItem('faceId1', azure[0].faceId);
                     _this.utility.presentAlert('Register Succesful');
-                    return;
+                    _this.navigateToDashBoard();
                 }
                 var faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
                 _this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(function (verifyRes) {
                     if (verifyRes.isIdentical) {
-                        _this.setAndGet.UserName = _this.data.userName;
-                        _this.navCtrl.setRoot('DashboardPage');
+                        _this.navigateToDashBoard();
                     }
                 });
             }, function (err) {
@@ -141,6 +139,10 @@ var LoginpagePage = /** @class */ (function () {
         });
     };
     LoginpagePage.prototype.register = function () {
+        if (!this.data.userName) {
+            this.utility.presentAlert("Please enter Username!");
+            return;
+        }
         this.analyzeFace();
     };
     LoginpagePage.prototype.verifyIfFirstTimeLogin = function () {
@@ -148,13 +150,17 @@ var LoginpagePage = /** @class */ (function () {
             this.utility.presentAlert('User not found.');
         }
         else {
-            console.log('with faceid');
+            ;
             this.analyzeFace();
         }
     };
+    LoginpagePage.prototype.navigateToDashBoard = function () {
+        this.setAndGet.UserName = this.data.userName;
+        this.navCtrl.setRoot('DashboardPage');
+    };
     LoginpagePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({
-            selector: 'page-loginpage',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/'<ion-header>\n\n\n\n</ion-header>\n\n\n\n<ion-content padding style="background-color:silver" >\n\n\n\n  <h1 style="text-align: center; margin-top: 10%;font-style:italic; font-family:Cambria; font-size:30px">Face Auth <br> Demo App</h1>\n\n  <div class="container">\n\n    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>\n\n  </div>\n\n  <div *ngIf="error" class="error">\n\n        {{ error }}\n\n  </div>\n\n  <form style="margin-top: 10%" >\n\n    <div class="container">\n\n      <label><b>Username</b></label>\n\n      <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>\n\n\n\n      <button type="submit" (tap)="login();" >Login</button>\n\n      <label>\n\n        <input type="checkbox" checked="checked"> Remember me\n\n      </label>\n\n      <button type="submit" (tap)="register();" >First time Login</button>\n\n    </div>\n\n  </form>\n\n</ion-content>\n\n'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/,
+            selector: 'page-loginpage',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/'<ion-header>\n\n\n\n</ion-header>\n\n\n\n<ion-content padding style="background-color:silver" >\n\n\n\n  <h1 style="text-align: center; margin-top: 10%;font-style:italic; font-family:Cambria; font-size:30px">Face Auth <br> Demo App</h1>\n\n  <div class="container">\n\n    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>\n\n    <div *ngIf="error" class="error">\n\n      {{ error }}\n\n    </div>\n\n  </div>\n\n\n\n  <form style="margin-top: 10%" >\n\n    <div class="container">\n\n      <label><b>Username</b></label>\n\n      <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>\n\n\n\n      <button type="submit" (tap)="login();" >Login</button>\n\n      <label>\n\n        <input type="checkbox" checked="checked"> Remember me\n\n      </label>\n\n      <button type="submit" (tap)="register();" >First time Login</button>\n\n    </div>\n\n  </form>\n\n</ion-content>\n\n'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/,
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */],
             __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["h" /* NavParams */],
