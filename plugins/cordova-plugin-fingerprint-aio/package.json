@@ -1,5 +1,5 @@
 {
-  "_from": "cordova-plugin-fingerprint-aio@^1.3.8",
+  "_from": "cordova-plugin-fingerprint-aio@^1.6.0",
   "_id": "cordova-plugin-fingerprint-aio@1.6.0",
   "_inBundle": false,
   "_integrity": "sha512-2Hqa1FVSG7NCzhO4lXh92UXkGHvaLy47q0aF39jpd1yJJr6ctDybU10HIKhe6QX1T4qVNiUuzksjqvV9eLPFng==",
@@ -8,12 +8,12 @@
   "_requested": {
     "type": "range",
     "registry": true,
-    "raw": "cordova-plugin-fingerprint-aio@^1.3.8",
+    "raw": "cordova-plugin-fingerprint-aio@^1.6.0",
     "name": "cordova-plugin-fingerprint-aio",
     "escapedName": "cordova-plugin-fingerprint-aio",
-    "rawSpec": "^1.3.8",
+    "rawSpec": "^1.6.0",
     "saveSpec": null,
-    "fetchSpec": "^1.3.8"
+    "fetchSpec": "^1.6.0"
   },
   "_requiredBy": [
     "#USER",
@@ -21,8 +21,8 @@
   ],
   "_resolved": "https://registry.npmjs.org/cordova-plugin-fingerprint-aio/-/cordova-plugin-fingerprint-aio-1.6.0.tgz",
   "_shasum": "3053060fc5a375d62ce6c5314cb2881d2b3b298b",
-  "_spec": "cordova-plugin-fingerprint-aio@^1.3.8",
-  "_where": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp",
+  "_spec": "cordova-plugin-fingerprint-aio@^1.6.0",
+  "_where": "D:\\Source Codes\\Ionic\\FaceAuth",
   "author": {
     "name": "Niklas Merz"
   },

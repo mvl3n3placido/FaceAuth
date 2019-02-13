@@ -1,5 +1,5 @@
 {
-  "_from": "cordova-plugin-ionic-webview@^2.0.2",
+  "_from": "cordova-plugin-ionic-webview@^2.3.3",
   "_id": "cordova-plugin-ionic-webview@2.3.3",
   "_inBundle": false,
   "_integrity": "sha512-LMto7S2xjsPS0LiZvYcm8ZAFqobx01CH07TShi016Ah77J5IAr9CJkA4cJOf0+2CREwP3W+PM5n5Pet2x4t21A==",
@@ -8,12 +8,12 @@
   "_requested": {
     "type": "range",
     "registry": true,
-    "raw": "cordova-plugin-ionic-webview@^2.0.2",
+    "raw": "cordova-plugin-ionic-webview@^2.3.3",
     "name": "cordova-plugin-ionic-webview",
     "escapedName": "cordova-plugin-ionic-webview",
-    "rawSpec": "^2.0.2",
+    "rawSpec": "^2.3.3",
     "saveSpec": null,
-    "fetchSpec": "^2.0.2"
+    "fetchSpec": "^2.3.3"
   },
   "_requiredBy": [
     "#USER",
@@ -21,8 +21,8 @@
   ],
   "_resolved": "https://registry.npmjs.org/cordova-plugin-ionic-webview/-/cordova-plugin-ionic-webview-2.3.3.tgz",
   "_shasum": "bd3513b0c1e02405b3111f1451260c1ca242f65b",
-  "_spec": "cordova-plugin-ionic-webview@^2.0.2",
-  "_where": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp",
+  "_spec": "cordova-plugin-ionic-webview@^2.3.3",
+  "_where": "D:\\Source Codes\\Ionic\\FaceAuth",
   "author": {
     "name": "Ionic Team"
   },

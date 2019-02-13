@@ -1,6 +1,6 @@
 import { Constants } from './../../providers/constants/constants';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController } from 'ionic-angular';
 import { UtilityProvider } from '../../providers/utility/utility'
 import { Platform } from 'ionic-angular';
 import 'rxjs/Rx';
@@ -27,7 +27,6 @@ export class LoginpagePage {
   public loading: boolean;
   constructor(
     private navCtrl: NavController,
-    private navParams: NavParams,
     private utility: UtilityProvider,
     private setAndGet: SettersandgettersProvider,
     private camera: Camera,
@@ -105,7 +104,11 @@ export class LoginpagePage {
       this.loading = true;
       this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(azure => {
         this.loading = false;
-        if (!sessionStorage.getItem('faceId1')) {
+        if(azure.length === 0) {
+          this.utility.presentAlert('Please try again.');
+          return;
+        }
+        if (!sessionStorage.getItem('faceId1') && azure[0].faceId) {
           sessionStorage.setItem('faceId1', azure[0].faceId);
           this.utility.presentAlert('Register Succesful');
           this.navigateToDashBoard();
@@ -114,6 +117,8 @@ export class LoginpagePage {
         this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(verifyRes => {
           if (verifyRes.isIdentical) {
             this.navigateToDashBoard();
+          }else{
+            this.utility.presentAlert("Invalid FaceId!");
           }
         });
       }, (err) => {

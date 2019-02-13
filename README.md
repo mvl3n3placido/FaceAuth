@@ -1,3 +1,3 @@
-# BiometricAuthenticationApp
+# FaceAuthenticationApp
 
-A demo Ionic 3 App with Fingerprint and Face Authentication on Android and iOS. Using plugin Cordova Fingerprint AIO.
+A demo Ionic 3 App with Microsoft Azure Face APi for Authentication.

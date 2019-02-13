@@ -32,9 +32,9 @@
                     "to": {
                         "startLines": "8,9,10,11,12,13,14,15,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "362,447,501,585,643,737,783,854,975,1114",
+                        "startOffsets": "361,446,500,584,642,736,782,853,974,1113",
                         "endColumns": "84,53,83,57,93,45,70,61,138,84",
-                        "endOffsets": "442,496,580,638,732,778,849,911,1109,1194"
+                        "endOffsets": "441,495,579,637,731,777,848,910,1108,1193"
                     }
                 },
                 {
@@ -50,10 +50,10 @@
                     "to": {
                         "startLines": "19",
                         "startColumns": "4",
-                        "startOffsets": "1199",
+                        "startOffsets": "1198",
                         "endLines": "24",
                         "endColumns": "10",
-                        "endOffsets": "1520"
+                        "endOffsets": "1519"
                     }
                 },
                 {
@@ -78,102 +78,16 @@
                     "from": {
                         "startLines": "4,2,3",
                         "startColumns": "4,4,4",
-                        "startOffsets": "168,55,109",
-                        "endColumns": "63,53,58",
-                        "endOffsets": "227,104,163"
+                        "startOffsets": "167,55,108",
+                        "endColumns": "63,52,58",
+                        "endOffsets": "226,103,162"
                     },
                     "to": {
                         "startLines": "6,7,16",
                         "startColumns": "4,4,4",
-                        "startOffsets": "244,308,916",
-                        "endColumns": "63,53,58",
-                        "endOffsets": "303,357,970"
-                    }
-                }
-            ]
-        },
-        {
-            "outputFile": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
-            "map": [
-                {
-                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values\\camera_theme.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "2",
-                        "startOffsets": "53",
-                        "endLines": "7",
-                        "endColumns": "10",
-                        "endOffsets": "374"
-                    },
-                    "to": {
-                        "startLines": "19",
-                        "startColumns": "4",
-                        "startOffsets": "1199",
-                        "endLines": "24",
-                        "endColumns": "10",
-                        "endOffsets": "1520"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values\\camera_ids.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "2",
-                        "startOffsets": "53",
-                        "endColumns": "44",
-                        "endOffsets": "95"
-                    },
-                    "to": {
-                        "startLines": "5",
-                        "startColumns": "4",
-                        "startOffsets": "198",
-                        "endColumns": "45",
-                        "endOffsets": "239"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values\\strings.xml",
-                    "from": {
-                        "startLines": "-1,-1,-1",
-                        "startColumns": "-1,-1,-1",
-                        "startOffsets": "-1,-1,-1"
-                    },
-                    "to": {
-                        "startLines": "6,7,16",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "244,308,916",
-                        "endColumns": "63,53,58",
-                        "endOffsets": "303,357,970"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values\\fpauth-strings.xml",
-                    "from": {
-                        "startLines": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "startColumns": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1",
-                        "startOffsets": "-1,-1,-1,-1,-1,-1,-1,-1,-1,-1"
-                    },
-                    "to": {
-                        "startLines": "8,9,10,11,12,13,14,15,17,18",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "362,447,501,585,643,737,783,854,975,1114",
-                        "endColumns": "84,53,83,57,93,45,70,61,138,84",
-                        "endOffsets": "442,496,580,638,732,778,849,911,1109,1194"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\user\\Desktop\\BiometricAuthenticationApp\\platforms\\android\\app\\src\\main\\res\\values\\fpauth-colors.xml",
-                    "from": {
-                        "startLines": "-1,-1,-1",
-                        "startColumns": "-1,-1,-1",
-                        "startOffsets": "-1,-1,-1"
-                    },
-                    "to": {
-                        "startLines": "2,3,4",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,102,150",
-                        "endColumns": "46,47,47",
-                        "endOffsets": "97,145,193"
+                        "startOffsets": "244,308,915",
+                        "endColumns": "63,52,58",
+                        "endOffsets": "303,356,969"
                     }
                 }
             ]

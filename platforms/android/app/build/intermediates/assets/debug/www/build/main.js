@@ -39,10 +39,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
  * Ionic pages and navigation.
  */
 var LoginpagePage = /** @class */ (function () {
-    function LoginpagePage(navCtrl, navParams, utility, setAndGet, camera, platform, service) {
+    function LoginpagePage(navCtrl, utility, setAndGet, camera, platform, service) {
         var _this = this;
         this.navCtrl = navCtrl;
-        this.navParams = navParams;
         this.utility = utility;
         this.setAndGet = setAndGet;
         this.camera = camera;
@@ -116,7 +115,11 @@ var LoginpagePage = /** @class */ (function () {
             _this.loading = true;
             _this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(function (azure) {
                 _this.loading = false;
-                if (!sessionStorage.getItem('faceId1')) {
+                if (azure.length === 0) {
+                    _this.utility.presentAlert('Please try again.');
+                    return;
+                }
+                if (!sessionStorage.getItem('faceId1') && azure[0].faceId) {
                     sessionStorage.setItem('faceId1', azure[0].faceId);
                     _this.utility.presentAlert('Register Succesful');
                     _this.navigateToDashBoard();
@@ -125,6 +128,9 @@ var LoginpagePage = /** @class */ (function () {
                 _this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(function (verifyRes) {
                     if (verifyRes.isIdentical) {
                         _this.navigateToDashBoard();
+                    }
+                    else {
+                        _this.utility.presentAlert("Invalid FaceId!");
                     }
                 });
             }, function (err) {
@@ -163,7 +169,6 @@ var LoginpagePage = /** @class */ (function () {
             selector: 'page-loginpage',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/'<ion-header>\n\n\n\n</ion-header>\n\n\n\n<ion-content padding style="background-color:silver" >\n\n\n\n  <h1>Face Auth <br> Demo App</h1>\n\n  <div class="container">\n\n    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>\n\n    <div *ngIf="error" class="error">\n\n      {{ error }}\n\n    </div>\n\n  </div>\n\n\n\n  <form >\n\n    <div class="container">\n\n      <label><b>Username</b></label>\n\n      <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>\n\n\n\n      <button type="submit" (tap)="login();" >Login</button>\n\n      <label>\n\n        <input type="checkbox" checked="checked"> Remember me\n\n      </label>\n\n      <button type="submit" (tap)="register();" >Sign up</button>\n\n    </div>\n\n  </form>\n\n</ion-content>\n\n'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/,
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["h" /* NavParams */],
             __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */],
             __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */],
             __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */],
