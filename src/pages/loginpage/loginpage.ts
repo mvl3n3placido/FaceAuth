@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { UtilityProvider } from '../../providers/utility/utility'
 import { Platform } from 'ionic-angular';
-// import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
+import 'rxjs/Rx';
 import { SettersandgettersProvider } from '../../providers/settersandgetters/settersandgetters';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { ServiceRequest } from './../../providers/services/request-handler.service';
@@ -24,9 +24,7 @@ export class LoginpagePage {
 
   public options: CameraOptions;
   public error: string;
-  public image: string;
   public loading: boolean;
-  public isFirstTimeLogin: boolean;
   constructor(
     private navCtrl: NavController,
     private navParams: NavParams,
@@ -35,7 +33,7 @@ export class LoginpagePage {
     private camera: Camera,
     private platform: Platform,
     private service: ServiceRequest) {
-      this.isFirstTimeLogin = false;
+    this.error = null;
     this.platform.ready().then(() => {
       this.options = this.getCameraOptions();
     });
@@ -49,45 +47,7 @@ export class LoginpagePage {
       this.utility.presentAlert("Please enter Username!");
       return;
     }
-    // else {
-    //   //Check if Fingerprint or Face  is available
-    //   this.faio.isAvailable()
-    //     .then(result => {
-    //       console.log(result);
-    //       if (result === "finger" || result === "face") {
-    //         //Fingerprint or Face Auth is available
-    //         console.log("Fingerprint or Face Exist!")
-    //         this.faio.show({
-    //           clientId: 'DemoBioAuthApp',
-    //           clientSecret: 'bioAuthDemo', //Only necessary for Android
-    //           disableBackup: true, //Only for Android(optional)
-    //           localizedFallbackTitle: 'Use Pin', //Only for iOS
-    //           localizedReason: 'Please Authenticate' //Only for iOS
-    //         })
-    //           .then((result: any) => {
-    //             console.log(result);
-    //             if (result) {
-    //               this.setAndGet.UserName = this.data.userName;
-    //               this.navCtrl.setRoot('DashboardPage');
-    //             }
-    //             else {
-    //               //Fingerprint/Face was not successfully verified
-    //               this.utility.presentAlert(result);
-    //             }
-    //           })
-    //           .catch((error: any) => {
-    //             //Fingerprint/Face was not successfully verified
-    //             this.utility.presentAlert(error);
-    //           });
-    //       }
-    //       else {
-    //         //Fingerprint or Face Auth is not available
-    //         this.utility.presentAlert("Fingerprint/Face Auth is not available on this device!");
-    //         console.log("Fingerprint/Face Auth is not available on this device!")
-    //       }
-    //     })
-    // }
-    this.analyzeFace();
+    this.verifyIfFirstTimeLogin();
   }
   getCameraOptions() {
     return {
@@ -105,15 +65,11 @@ export class LoginpagePage {
   }
 
   public analyzeFace(): void {
-    this.error = null;
     this.takePhoto(
-      // If photo was taken
       (photo) => {
-        this.image = photo;
         this.loading = true;
-        this.sendToImgur(photo);
+        this.analyzePhoto(photo);
       },
-      // If photo wasn't taken
       () => {
         this.error = `Error: Phone couldn't take the photo.`;
       }
@@ -135,12 +91,11 @@ export class LoginpagePage {
     });
   }
 
-  sendToImgur(image: string) {
+  analyzePhoto(image: string) {
+    debugger;
     image = image.substring(image.indexOf('base64,') + 'base64,'.length);
-    const formData = new FormData();
-    formData.append('image', image);
     this.service.sendImageToImgur(image).subscribe((imgurRes) => {
-      console.log('imgurRes', imgurRes);
+      this.loading = false;
       const serialize = (parameters: object) => Object.keys(parameters).map(key => key + '=' + parameters[key]).join('&');
       const faceParameters: object = {
         returnFaceId: true,
@@ -148,15 +103,20 @@ export class LoginpagePage {
         returnFaceAttributes: Constants.FACE_ATTRIBUTES
       };
       const serializedFaceParameters: string = serialize(faceParameters);
-        this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(azure => {
-        console.log('azure', azure);
-        if(this.isFirstTimeLogin){
-          sessionStorage.setItem('faceId1', azure[0].faceId);
-        }
+      this.loading = true;
+      this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(azure => {
         this.loading = false;
+        if (!sessionStorage.getItem('faceId1')) {
+          sessionStorage.setItem('faceId1', azure[0].faceId);
+          this.utility.presentAlert('Register Succesful');
+          return;
+        }
         const faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
         this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(verifyRes => {
-          console.log(verifyRes);
+          if (verifyRes.isIdentical) {
+            this.setAndGet.UserName = this.data.userName;
+            this.navCtrl.setRoot('DashboardPage');
+          }
         });
       }, (err) => {
         console.log(err);
@@ -171,8 +131,14 @@ export class LoginpagePage {
   }
 
   register() {
-    this.isFirstTimeLogin = true;
     this.analyzeFace();
   }
+  verifyIfFirstTimeLogin() {
+    if (!sessionStorage.getItem('faceId1')) {
+      this.utility.presentAlert('User not found.');
+    } else {;
+      this.analyzeFace();
+    }
 
+  }
 }

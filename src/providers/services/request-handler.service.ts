@@ -11,17 +11,17 @@ export class ServiceRequest {
     /** post data */
     postData(url, body, token) {
         const options = this.setRequestOptions(token);
-        return this.http.post(url, body, options).pipe(map((response: any) => response.json()));
+        return this.http.post(url, body, options).map((response: any) => response.json());
     }
     /** get data */
     getData(url, token) {
         const options = this.setRequestOptions(token);
-        return this.http.get(url, options).pipe(map((response: any) => response.json()));
+        return this.http.get(url, options).map((response: any) => response.json());
     }
     /** update data */
     putData(url, body, token) {
         const options = this.setRequestOptions(token);
-        return this.http.put(url, body, options).pipe(map((response: any) => response.json()));
+        return this.http.put(url, body, options).map((response: any) => response.json());
     }
     /** set request Options */
     setRequestOptions(token: string): RequestOptions {
