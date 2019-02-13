@@ -58,7 +58,7 @@ export class LoginpagePage {
       targetHeight: 600,
       saveToPhotoAlbum: false,
       allowEdit: true,
-      sourceType: 1,
+      sourceType: this.camera.PictureSourceType.CAMERA,
       correctOrientation: false,
       cameraDirection: this.camera.Direction.FRONT
     };

@@ -12,7 +12,6 @@ import { LoginpagePage } from '../pages/loginpage/loginpage';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { SettersandgettersProvider } from '../providers/settersandgetters/settersandgetters';
-import { FingerprintAIO } from '@ionic-native/fingerprint-aio';
 import { UtilityProvider } from '../providers/utility/utility';
 import { ServiceRequest } from './../providers/services/request-handler.service';
 
@@ -42,7 +41,6 @@ import { ServiceRequest } from './../providers/services/request-handler.service'
     ServiceRequest,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     SettersandgettersProvider,
-    FingerprintAIO,
     UtilityProvider
   ]
 })

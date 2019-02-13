@@ -4,15 +4,15 @@
 
 <ion-content padding style="background-color:silver" >
 
-  <h1 style="text-align: center; margin-top: 10%;font-style:italic; font-family:Cambria; font-size:30px">Face Auth <br> Demo App</h1>
+  <h1>Face Auth <br> Demo App</h1>
   <div class="container">
-    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
     <div *ngIf="error" class="error">
       {{ error }}
     </div>
   </div>
 
-  <form style="margin-top: 10%" >
+  <form >
     <div class="container">
       <label><b>Username</b></label>
       <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>
@@ -21,7 +21,7 @@
       <label>
         <input type="checkbox" checked="checked"> Remember me
       </label>
-      <button type="submit" (tap)="register();" >First time Login</button>
+      <button type="submit" (tap)="register();" >Sign up</button>
     </div>
   </form>
 </ion-content>
