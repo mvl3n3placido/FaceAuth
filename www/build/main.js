@@ -128,8 +128,6 @@ var FaceLoginPage = /** @class */ (function () {
         this.navCtrl = navCtrl;
         this.platform = platform;
         this.service = service;
-        this.innerWidth = window.innerWidth;
-        this.innerHeight = window.innerHeight;
         this.platform.ready().then(function () {
             _this.faceInitialiazed = false;
         });
@@ -155,6 +153,7 @@ var FaceLoginPage = /** @class */ (function () {
           (2) get the drawing context on the canvas and define a function to transform an RGBA image to grayscale
         */
         var ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
+        var imageCaptured = false;
         function rgba_to_grayscale(rgba, nrows, ncols) {
             var gray = new Uint8Array(nrows * ncols);
             for (var r = 0; r < nrows; ++r)
@@ -198,9 +197,18 @@ var FaceLoginPage = /** @class */ (function () {
                     ctx.beginPath();
                     ctx.arc(dets[i][1], dets[i][0], dets[i][2] / 2, 0, 2 * Math.PI, false);
                     ctx.lineWidth = 3;
-                    ctx.strokeStyle = 'red';
+                    ctx.strokeStyle = 'green';
                     ctx.stroke();
+                    convertCanvastoImage(dets[i][3] > 50.0);
                 }
+            function convertCanvastoImage(dets) {
+                if (!imageCaptured && dets) {
+                    var canvas = document.getElementById('canvas');
+                    var dataURL = canvas.toDataURL('image/jpeg', 1.0);
+                    console.log(dataURL);
+                    imageCaptured = true;
+                }
+            }
         };
         /*
           (4) instantiate camera handling (see https://github.com/cbrandolino/camvas)
@@ -211,13 +219,9 @@ var FaceLoginPage = /** @class */ (function () {
         */
         this.faceInitialiazed = true;
     };
-    FaceLoginPage.prototype.convertCanvastoImage = function () {
-        var canvas = document.getElementById('canvas');
-        var dataURL = canvas.toDataURL('image/jpeg', 1.0);
-    };
     FaceLoginPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({
-            selector: 'page-face-login',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>\n      Register Face Id\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n<ion-content padding>\n  <div class="ion-canvas">\n    <div><canvas #canvas width=640 height=480></canvas></div>\n  </div>\n</ion-content>'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/,
+            selector: 'page-face-login',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>\n      Register Face Id\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n<ion-content padding>\n  <div class="ion-canvas">\n    <div><canvas id="canvas" width=640 height=480></canvas></div>\n  </div>\n</ion-content>'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/,
         }),
         __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _c || Object])
     ], FaceLoginPage);
@@ -383,11 +387,6 @@ var LoginPage = /** @class */ (function () {
         this.analyzeFace();
     };
     LoginPage.prototype.verifyIfFirstTimeLogin = function () {
-        // if (!sessionStorage.getItem('faceId1')) {
-        //   this.utility.presentAlert('User not found.');
-        // } else {
-        //   this.analyzeFace();
-        // }
         this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_8__face_login_face_login__["a" /* FaceLoginPage */]);
     };
     LoginPage.prototype.navigateToDashBoard = function () {
@@ -398,14 +397,10 @@ var LoginPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({
             selector: 'page-loginpage',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/'<ion-header>\n\n\n\n</ion-header>\n\n\n\n<ion-content padding style="background-color:silver" >\n\n\n\n  <h1>Face Auth <br> Demo App</h1>\n\n  <div class="container">\n\n    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>\n\n    <div *ngIf="error" class="error">\n\n      {{ error }}\n\n    </div>\n\n  </div>\n\n\n\n  <form >\n\n    <div class="container">\n\n      <label><b>Username</b></label>\n\n      <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>\n\n\n\n      <button type="submit" (tap)="login();" >Login</button>\n\n      <label>\n\n        <input type="checkbox" checked="checked"> Remember me\n\n      </label>\n\n      <button type="submit" (tap)="register();" >Sign up</button>\n\n    </div>\n\n  </form>\n\n</ion-content>\n\n'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */],
-            __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */],
-            __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */],
-            __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */],
-            __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__["a" /* ServiceRequest */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _f || Object])
     ], LoginPage);
     return LoginPage;
+    var _a, _b, _c, _d, _e, _f;
 }());
 
 //# sourceMappingURL=loginpage.js.map
@@ -479,8 +474,6 @@ var Constants = /** @class */ (function () {
     Constants.AZURE_ENDPOINT = 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0';
     // Azure Face API key
     Constants.AZURE_API_KEY = '034211f6b08e4e75ae9285e5fc02c369';
-    // temp faceId
-    // public static faceId = '0dd308d4-5a06-42d7-9363-42026953b5f6';
     Constants.FACE_ATTRIBUTES = "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise";
     Constants.PICOJS_CASCADE_URL = "https://raw.githubusercontent.com/nenadmarkus/pico/c2e81f9d23cc11d1a612fd21e4f9de0921a5d0d9/rnt/cascades/facefinder";
     return Constants;

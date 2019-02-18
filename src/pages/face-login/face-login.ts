@@ -20,23 +20,19 @@ import { ServiceRequest } from './../../providers/services/request-handler.servi
 })
 export class FaceLoginPage {
   public faceInitialiazed: boolean;
-  public innerHeight: any;
-  public innerWidth: any;
   constructor(
     public navCtrl: NavController,
     private platform: Platform,
     private service: ServiceRequest
   ) {
-    this.innerWidth = window.innerWidth;
-    this.innerHeight = window.innerHeight;
     this.platform.ready().then(() => {
       this.faceInitialiazed = false;
     })
 
   }
-ionViewDidLoad() {
-  this.picoJsDetector();
-}
+  ionViewDidLoad() {
+    this.picoJsDetector();
+  }
   picoJsDetector() {
     if (this.faceInitialiazed) {
       return;
@@ -54,7 +50,8 @@ ionViewDidLoad() {
     /*
       (2) get the drawing context on the canvas and define a function to transform an RGBA image to grayscale
     */
-    var ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
+    let ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
+    let imageCaptured: boolean = false;
     function rgba_to_grayscale(rgba, nrows, ncols) {
       var gray = new Uint8Array(nrows * ncols);
       for (var r = 0; r < nrows; ++r)
@@ -63,6 +60,7 @@ ionViewDidLoad() {
           gray[r * ncols + c] = (2 * rgba[r * 4 * ncols + 4 * c + 0] + 7 * rgba[r * 4 * ncols + 4 * c + 1] + 1 * rgba[r * 4 * ncols + 4 * c + 2]) / 10;
       return gray;
     }
+
     /*
       (3) this function is called each time a video frame becomes available
     */
@@ -98,8 +96,17 @@ ionViewDidLoad() {
           ctx.beginPath();
           ctx.arc(dets[i][1], dets[i][0], dets[i][2] / 2, 0, 2 * Math.PI, false);
           ctx.lineWidth = 3;
-          ctx.strokeStyle = 'red';
+          ctx.strokeStyle = 'green';
           ctx.stroke();
+          convertCanvastoImage(dets[i][3] > 50.0);
+        }
+        function convertCanvastoImage(dets) {
+          if (!imageCaptured && dets) {
+            const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+            const dataURL = canvas.toDataURL('image/jpeg', 1.0);
+            console.log(dataURL);
+            imageCaptured = true;
+          }
         }
     }
     /*
@@ -112,8 +119,5 @@ ionViewDidLoad() {
     this.faceInitialiazed = true;
   }
 
-  convertCanvastoImage() {
-    const canvas = <HTMLCanvasElement>document.getElementById('canvas');
-    const dataURL = canvas.toDataURL('image/jpeg', 1.0);
-  }
 }
+

@@ -141,11 +141,6 @@ export class LoginPage {
     this.analyzeFace();
   }
   verifyIfFirstTimeLogin() {
-    // if (!sessionStorage.getItem('faceId1')) {
-    //   this.utility.presentAlert('User not found.');
-    // } else {
-    //   this.analyzeFace();
-    // }
     this.navCtrl.push(FaceLoginPage)
   }
 

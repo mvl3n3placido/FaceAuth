@@ -8,8 +8,6 @@ export class Constants {
     public static AZURE_ENDPOINT = 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0';
     // Azure Face API key
     public static AZURE_API_KEY = '034211f6b08e4e75ae9285e5fc02c369';
-    // temp faceId
-    // public static faceId = '0dd308d4-5a06-42d7-9363-42026953b5f6';
 
     public static FACE_ATTRIBUTES = `age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise`;
 
