@@ -14,9 +14,9 @@ export class ServiceRequest {
         return this.http.post(url, body, options).map((response: any) => response.json());
     }
     /** get data */
-    getData(url, token) {
-        const options = this.setRequestOptions(token);
-        return this.http.get(url, options).map((response: any) => response.json());
+    getData(url) {
+        // const options = this.setRequestOptions(token);
+        return this.http.get(url);
     }
     /** update data */
     putData(url, body, token) {

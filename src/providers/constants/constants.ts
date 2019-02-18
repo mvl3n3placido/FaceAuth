@@ -12,5 +12,9 @@ export class Constants {
     // public static faceId = '0dd308d4-5a06-42d7-9363-42026953b5f6';
 
     public static FACE_ATTRIBUTES = `age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise`;
+
+    public static PICOJS_CASCADE_URL = `https://raw.githubusercontent.com/nenadmarkus/pico/c2e81f9d23cc11d1a612fd21e4f9de0921a5d0d9/rnt/cascades/facefinder`;
+
+
 }
 

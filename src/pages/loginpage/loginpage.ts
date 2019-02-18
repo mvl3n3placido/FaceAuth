@@ -7,7 +7,7 @@ import 'rxjs/Rx';
 import { SettersandgettersProvider } from '../../providers/settersandgetters/settersandgetters';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { ServiceRequest } from './../../providers/services/request-handler.service';
-
+import { FaceLoginPage } from './../face-login/face-login';
 /**
  * Generated class for the LoginpagePage page.
  *
@@ -20,7 +20,7 @@ import { ServiceRequest } from './../../providers/services/request-handler.servi
   selector: 'page-loginpage',
   templateUrl: 'loginpage.html',
 })
-export class LoginpagePage {
+export class LoginPage {
 
   public options: CameraOptions;
   public error: string;
@@ -141,12 +141,12 @@ export class LoginpagePage {
     this.analyzeFace();
   }
   verifyIfFirstTimeLogin() {
-    if (!sessionStorage.getItem('faceId1')) {
-      this.utility.presentAlert('User not found.');
-    } else {
-      ;
-      this.analyzeFace();
-    }
+    // if (!sessionStorage.getItem('faceId1')) {
+    //   this.utility.presentAlert('User not found.');
+    // } else {
+    //   this.analyzeFace();
+    // }
+    this.navCtrl.push(FaceLoginPage)
   }
 
   navigateToDashBoard() {

@@ -1,11 +1,11 @@
 [
     {
-        "merged": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-land-xxxhdpi_screen.png.flat",
-        "source": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\src\\main\\res\\drawable-land-xxxhdpi\\screen.png"
-    },
-    {
         "merged": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-port-ldpi_screen.png.flat",
         "source": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\src\\main\\res\\drawable-port-ldpi\\screen.png"
+    },
+    {
+        "merged": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-land-xxxhdpi_screen.png.flat",
+        "source": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\src\\main\\res\\drawable-land-xxxhdpi\\screen.png"
     },
     {
         "merged": "D:\\Source Codes\\Ionic\\FaceAuth\\platforms\\android\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_icon.png.flat",

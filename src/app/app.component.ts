@@ -5,7 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
-import { LoginpagePage } from '../pages/loginpage/loginpage';
+import { LoginPage } from '../pages/loginpage/loginpage';
 
 @Component({
   templateUrl: 'app.html'
@@ -13,7 +13,7 @@ import { LoginpagePage } from '../pages/loginpage/loginpage';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage: any = LoginpagePage;
+  rootPage: any = LoginPage;
   pages: Array<{ title: string, component: any }>;
 
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
@@ -37,7 +37,7 @@ export class MyApp {
     if (page.component) {
       this.nav.setRoot(page.component);
     } else {
-      this.nav.setRoot(LoginpagePage);
+      this.nav.setRoot(LoginPage);
     }
   }
 }
