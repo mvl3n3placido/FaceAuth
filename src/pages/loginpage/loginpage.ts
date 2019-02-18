@@ -5,7 +5,6 @@ import { UtilityProvider } from '../../providers/utility/utility'
 import { Platform } from 'ionic-angular';
 import 'rxjs/Rx';
 import { SettersandgettersProvider } from '../../providers/settersandgetters/settersandgetters';
-import { Camera, CameraOptions } from '@ionic-native/camera';
 import { ServiceRequest } from './../../providers/services/request-handler.service';
 import { FaceLoginPage } from './../face-login/face-login';
 /**
@@ -22,19 +21,16 @@ import { FaceLoginPage } from './../face-login/face-login';
 })
 export class LoginPage {
 
-  public options: CameraOptions;
   public error: string;
   public loading: boolean;
   constructor(
     private navCtrl: NavController,
     private utility: UtilityProvider,
     private setAndGet: SettersandgettersProvider,
-    private camera: Camera,
     private platform: Platform,
     private service: ServiceRequest) {
     this.error = null;
     this.platform.ready().then(() => {
-      this.options = this.getCameraOptions();
     });
   }
   data = {
@@ -46,91 +42,8 @@ export class LoginPage {
       this.utility.presentAlert("Please enter Username!");
       return;
     }
+    this.setAndGet.UserName = this.data.userName;
     this.verifyIfFirstTimeLogin();
-  }
-  getCameraOptions() {
-    return {
-      destinationType: this.camera.DestinationType.DATA_URL,
-      encodingType: this.camera.EncodingType.JPEG,
-      mediaType: this.camera.MediaType.PICTURE,
-      targetWidth: 600,
-      targetHeight: 600,
-      saveToPhotoAlbum: false,
-      allowEdit: true,
-      sourceType: this.camera.PictureSourceType.CAMERA,
-      correctOrientation: false,
-      cameraDirection: this.camera.Direction.FRONT
-    };
-  }
-
-  public analyzeFace(): void {
-    this.takePhoto(
-      (photo) => {
-        this.loading = true;
-        this.analyzePhoto(photo);
-      },
-      () => {
-        this.error = `Error: Phone couldn't take the photo.`;
-      }
-    );
-  }
-
-
-  // Takes a photo and returns it in a callback
-  public takePhoto(taken: Function = null, notTaken: Function = null): void {
-    this.camera.getPicture(this.options).then((imageData) => {
-      const base64Image: string = 'data:image/jpeg;base64,' + imageData;
-      if (taken) {
-        taken(base64Image);
-      }
-    }, (e) => {
-      if (notTaken) {
-        notTaken(e);
-      }
-    });
-  }
-
-  analyzePhoto(image: string) {
-    image = image.substring(image.indexOf('base64,') + 'base64,'.length);
-    this.service.sendImageToImgur(image).subscribe((imgurRes) => {
-      this.loading = false;
-      const serialize = (parameters: object) => Object.keys(parameters).map(key => key + '=' + parameters[key]).join('&');
-      const faceParameters: object = {
-        returnFaceId: true,
-        returnFaceLandmarks: false,
-        returnFaceAttributes: Constants.FACE_ATTRIBUTES
-      };
-      const serializedFaceParameters: string = serialize(faceParameters);
-      this.loading = true;
-      this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(azure => {
-        this.loading = false;
-        if(azure.length === 0) {
-          this.utility.presentAlert('Please try again.');
-          return;
-        }
-        if (!sessionStorage.getItem('faceId1') && azure[0].faceId) {
-          sessionStorage.setItem('faceId1', azure[0].faceId);
-          this.utility.presentAlert('Register Succesful');
-          this.navigateToDashBoard();
-        }
-        const faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
-        this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(verifyRes => {
-          if (verifyRes.isIdentical) {
-            this.navigateToDashBoard();
-          }else{
-            this.utility.presentAlert("Invalid FaceId!");
-          }
-        });
-      }, (err) => {
-        console.log(err);
-        this.loading = false;
-      }, () => {
-      });
-    }, (err) => {
-      console.log(err);
-      this.loading = false;
-    }, () => {
-    });
   }
 
   register() {
@@ -138,15 +51,14 @@ export class LoginPage {
       this.utility.presentAlert("Please enter Username!");
       return;
     }
-    this.analyzeFace();
-  }
-  verifyIfFirstTimeLogin() {
+    this.setAndGet.UserName = this.data.userName;
     this.navCtrl.push(FaceLoginPage)
   }
-
-  navigateToDashBoard() {
-    this.setAndGet.UserName = this.data.userName;
-    this.navCtrl.setRoot('DashboardPage');
+  verifyIfFirstTimeLogin() {
+    if (!sessionStorage.getItem('faceId1')) {
+      this.utility.presentAlert('User not found.');
+    }else{
+      this.navCtrl.push(FaceLoginPage);
+    }
   }
-
 }

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <ion-title>
-      Register Face Id
+      Kindly wait while we verify your Face Id.
     </ion-title>
   </ion-navbar>
 </ion-header>
@@ -9,4 +9,5 @@
   <div class="ion-canvas">
     <div><canvas id="canvas" width=640 height=480></canvas></div>
   </div>
+  <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
 </ion-content>

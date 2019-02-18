@@ -101,7 +101,8 @@ var ServiceRequest = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__providers_constants_constants__ = __webpack_require__(293);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_services_request_handler_service__ = __webpack_require__(114);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__ = __webpack_require__(294);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__providers_services_request_handler_service__ = __webpack_require__(114);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -116,6 +117,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 /**
  * Generated class for the FaceLoginPage page.
  *
@@ -123,14 +125,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
  * Ionic pages and navigation.
  */
 var FaceLoginPage = /** @class */ (function () {
-    function FaceLoginPage(navCtrl, platform, service) {
+    function FaceLoginPage(navCtrl, platform, service, utility) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.platform = platform;
         this.service = service;
+        this.utility = utility;
+        this.loading = false;
+        this.imageCaptured = false;
         this.platform.ready().then(function () {
             _this.faceInitialiazed = false;
         });
+        this.externalThis = this;
     }
     FaceLoginPage.prototype.ionViewDidLoad = function () {
         this.picoJsDetector();
@@ -139,6 +145,7 @@ var FaceLoginPage = /** @class */ (function () {
         if (this.faceInitialiazed) {
             return;
         }
+        var externalThis = this.externalThis;
         var update_memory = pico.instantiate_detection_memory(5); // we will use the detecions of the last 5 frames
         var facefinder_classify_region = function (r, c, s, pixels, ldim) { return -1.0; };
         var cascadeurl = __WEBPACK_IMPORTED_MODULE_0__providers_constants_constants__["a" /* Constants */].PICOJS_CASCADE_URL;
@@ -153,15 +160,6 @@ var FaceLoginPage = /** @class */ (function () {
           (2) get the drawing context on the canvas and define a function to transform an RGBA image to grayscale
         */
         var ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
-        var imageCaptured = false;
-        function rgba_to_grayscale(rgba, nrows, ncols) {
-            var gray = new Uint8Array(nrows * ncols);
-            for (var r = 0; r < nrows; ++r)
-                for (var c = 0; c < ncols; ++c)
-                    // gray = 0.2*red + 0.7*green + 0.1*blue
-                    gray[r * ncols + c] = (2 * rgba[r * 4 * ncols + 4 * c + 0] + 7 * rgba[r * 4 * ncols + 4 * c + 1] + 1 * rgba[r * 4 * ncols + 4 * c + 2]) / 10;
-            return gray;
-        }
         /*
           (3) this function is called each time a video frame becomes available
         */
@@ -169,9 +167,8 @@ var FaceLoginPage = /** @class */ (function () {
             // render the video frame to the canvas element and extract RGBA pixel data
             ctx.drawImage(video, 0, 0);
             var rgba = ctx.getImageData(0, 0, 640, 480).data;
-            // prepare input to `run_cascade`
             var image = {
-                "pixels": rgba_to_grayscale(rgba, 480, 640),
+                "pixels": externalThis.rgba_to_grayscale(rgba, 480, 640),
                 "nrows": 480,
                 "ncols": 640,
                 "ldim": 640
@@ -182,51 +179,98 @@ var FaceLoginPage = /** @class */ (function () {
                 "maxsize": 1000,
                 "scalefactor": 1.1 // for multiscale processing: resize the detection window by 10% when moving to the higher scale
             };
-            // run the cascade over the frame and cluster the obtained detections
-            // dets is an array that contains (r, c, s, q) quadruplets
-            // (representing row, column, scale and detection score)
             var dets = pico.run_cascade(image, facefinder_classify_region, params);
             dets = update_memory(dets);
             dets = pico.cluster_detections(dets, 0.2); // set IoU threshold to 0.2
             // draw detections
             for (var i = 0; i < dets.length; ++i)
-                // check the detection score
                 // if it's above the threshold, draw it
-                // (the constant 50.0 is empirical: other cascades might require a different one)
                 if (dets[i][3] > 50.0) {
                     ctx.beginPath();
                     ctx.arc(dets[i][1], dets[i][0], dets[i][2] / 2, 0, 2 * Math.PI, false);
                     ctx.lineWidth = 3;
                     ctx.strokeStyle = 'green';
                     ctx.stroke();
-                    convertCanvastoImage(dets[i][3] > 50.0);
+                    externalThis.convertCanvastoImage(dets[i][3] > 50.0);
                 }
-            function convertCanvastoImage(dets) {
-                if (!imageCaptured && dets) {
-                    var canvas = document.getElementById('canvas');
-                    var dataURL = canvas.toDataURL('image/jpeg', 1.0);
-                    console.log(dataURL);
-                    imageCaptured = true;
-                }
-            }
         };
         /*
           (4) instantiate camera handling (see https://github.com/cbrandolino/camvas)
         */
         new camvas(ctx, processfn);
-        /*
-          (5) it seems that everything went well
-        */
         this.faceInitialiazed = true;
+    };
+    FaceLoginPage.prototype.navigateToDashBoard = function () {
+        this.navCtrl.setRoot('DashboardPage');
+    };
+    FaceLoginPage.prototype.analyzePhoto = function (image) {
+        var _this = this;
+        this.imageCaptured = false;
+        image = image.substring(image.indexOf('base64,') + 'base64,'.length);
+        this.service.sendImageToImgur(image).subscribe(function (imgurRes) {
+            var serialize = function (parameters) { return Object.keys(parameters).map(function (key) { return key + '=' + parameters[key]; }).join('&'); };
+            var faceParameters = {
+                returnFaceId: true,
+                returnFaceLandmarks: false,
+                returnFaceAttributes: __WEBPACK_IMPORTED_MODULE_0__providers_constants_constants__["a" /* Constants */].FACE_ATTRIBUTES
+            };
+            var serializedFaceParameters = serialize(faceParameters);
+            _this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(function (azure) {
+                if (azure.length === 0) {
+                    _this.utility.presentAlert('Please try again.');
+                    return;
+                }
+                if (!sessionStorage.getItem('faceId1') && azure[0].faceId) {
+                    sessionStorage.setItem('faceId1', azure[0].faceId);
+                    _this.utility.presentAlert('Register Succesful');
+                    _this.navigateToDashBoard();
+                    return;
+                }
+                var faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
+                _this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(function (verifyRes) {
+                    if (verifyRes.isIdentical) {
+                        _this.navigateToDashBoard();
+                    }
+                    else {
+                        _this.utility.presentAlert("Invalid FaceId!");
+                        _this.navCtrl.pop();
+                    }
+                });
+            }, function (err) {
+                console.log(err);
+                _this.loading = false;
+            }, function () {
+            });
+        }, function (err) {
+            console.log(err);
+            _this.loading = false;
+        }, function () {
+        });
+    };
+    FaceLoginPage.prototype.rgba_to_grayscale = function (rgba, nrows, ncols) {
+        var gray = new Uint8Array(nrows * ncols);
+        for (var r = 0; r < nrows; ++r)
+            for (var c = 0; c < ncols; ++c)
+                // gray = 0.2*red + 0.7*green + 0.1*blue
+                gray[r * ncols + c] = (2 * rgba[r * 4 * ncols + 4 * c + 0] + 7 * rgba[r * 4 * ncols + 4 * c + 1] + 1 * rgba[r * 4 * ncols + 4 * c + 2]) / 10;
+        return gray;
+    };
+    FaceLoginPage.prototype.convertCanvastoImage = function (dets) {
+        if (!this.imageCaptured && dets) {
+            var canvas = document.getElementById('canvas');
+            var dataURL = canvas.toDataURL('image/jpeg', 1.0);
+            this.analyzePhoto(dataURL);
+            this.imageCaptured = true;
+        }
     };
     FaceLoginPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({
-            selector: 'page-face-login',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>\n      Register Face Id\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n<ion-content padding>\n  <div class="ion-canvas">\n    <div><canvas id="canvas" width=640 height=480></canvas></div>\n  </div>\n</ion-content>'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/,
+            selector: 'page-face-login',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>\n      Kindly wait while we verify your Face Id.\n    </ion-title>\n  </ion-navbar>\n</ion-header>\n<ion-content padding>\n  <div class="ion-canvas">\n    <div><canvas id="canvas" width=640 height=480></canvas></div>\n  </div>\n  <ion-spinner *ngIf="loading" name="dots"></ion-spinner>\n</ion-content>'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\face-login\face-login.html"*/,
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _c || Object])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */]) === "function" && _d || Object])
     ], FaceLoginPage);
     return FaceLoginPage;
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
 }());
 
 //# sourceMappingURL=face-login.js.map
@@ -238,16 +282,14 @@ var FaceLoginPage = /** @class */ (function () {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginPage; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__providers_constants_constants__ = __webpack_require__(293);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__ = __webpack_require__(294);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Rx__ = __webpack_require__(387);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_Rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__ = __webpack_require__(305);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__ = __webpack_require__(114);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__face_login_face_login__ = __webpack_require__(150);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__providers_utility_utility__ = __webpack_require__(294);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Rx__ = __webpack_require__(387);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Rx__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__providers_settersandgetters_settersandgetters__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__providers_services_request_handler_service__ = __webpack_require__(114);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__face_login_face_login__ = __webpack_require__(150);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -257,8 +299,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-
-
 
 
 
@@ -274,12 +314,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
  * Ionic pages and navigation.
  */
 var LoginPage = /** @class */ (function () {
-    function LoginPage(navCtrl, utility, setAndGet, camera, platform, service) {
-        var _this = this;
+    function LoginPage(navCtrl, utility, setAndGet, platform, service) {
         this.navCtrl = navCtrl;
         this.utility = utility;
         this.setAndGet = setAndGet;
-        this.camera = camera;
         this.platform = platform;
         this.service = service;
         this.data = {
@@ -287,7 +325,6 @@ var LoginPage = /** @class */ (function () {
         };
         this.error = null;
         this.platform.ready().then(function () {
-            _this.options = _this.getCameraOptions();
         });
     }
     LoginPage.prototype.login = function () {
@@ -295,112 +332,33 @@ var LoginPage = /** @class */ (function () {
             this.utility.presentAlert("Please enter Username!");
             return;
         }
+        this.setAndGet.UserName = this.data.userName;
         this.verifyIfFirstTimeLogin();
-    };
-    LoginPage.prototype.getCameraOptions = function () {
-        return {
-            destinationType: this.camera.DestinationType.DATA_URL,
-            encodingType: this.camera.EncodingType.JPEG,
-            mediaType: this.camera.MediaType.PICTURE,
-            targetWidth: 600,
-            targetHeight: 600,
-            saveToPhotoAlbum: false,
-            allowEdit: true,
-            sourceType: this.camera.PictureSourceType.CAMERA,
-            correctOrientation: false,
-            cameraDirection: this.camera.Direction.FRONT
-        };
-    };
-    LoginPage.prototype.analyzeFace = function () {
-        var _this = this;
-        this.takePhoto(function (photo) {
-            _this.loading = true;
-            _this.analyzePhoto(photo);
-        }, function () {
-            _this.error = "Error: Phone couldn't take the photo.";
-        });
-    };
-    // Takes a photo and returns it in a callback
-    LoginPage.prototype.takePhoto = function (taken, notTaken) {
-        if (taken === void 0) { taken = null; }
-        if (notTaken === void 0) { notTaken = null; }
-        this.camera.getPicture(this.options).then(function (imageData) {
-            var base64Image = 'data:image/jpeg;base64,' + imageData;
-            if (taken) {
-                taken(base64Image);
-            }
-        }, function (e) {
-            if (notTaken) {
-                notTaken(e);
-            }
-        });
-    };
-    LoginPage.prototype.analyzePhoto = function (image) {
-        var _this = this;
-        image = image.substring(image.indexOf('base64,') + 'base64,'.length);
-        this.service.sendImageToImgur(image).subscribe(function (imgurRes) {
-            _this.loading = false;
-            var serialize = function (parameters) { return Object.keys(parameters).map(function (key) { return key + '=' + parameters[key]; }).join('&'); };
-            var faceParameters = {
-                returnFaceId: true,
-                returnFaceLandmarks: false,
-                returnFaceAttributes: __WEBPACK_IMPORTED_MODULE_0__providers_constants_constants__["a" /* Constants */].FACE_ATTRIBUTES
-            };
-            var serializedFaceParameters = serialize(faceParameters);
-            _this.loading = true;
-            _this.service.analyzeFaceViaAzure(imgurRes.data.link, serializedFaceParameters).subscribe(function (azure) {
-                _this.loading = false;
-                if (azure.length === 0) {
-                    _this.utility.presentAlert('Please try again.');
-                    return;
-                }
-                if (!sessionStorage.getItem('faceId1') && azure[0].faceId) {
-                    sessionStorage.setItem('faceId1', azure[0].faceId);
-                    _this.utility.presentAlert('Register Succesful');
-                    _this.navigateToDashBoard();
-                }
-                var faceId1 = sessionStorage.getItem('faceId1') ? sessionStorage.getItem('faceId1') : '';
-                _this.service.verifyFaceViaAzure(faceId1, azure[0].faceId).subscribe(function (verifyRes) {
-                    if (verifyRes.isIdentical) {
-                        _this.navigateToDashBoard();
-                    }
-                    else {
-                        _this.utility.presentAlert("Invalid FaceId!");
-                    }
-                });
-            }, function (err) {
-                console.log(err);
-                _this.loading = false;
-            }, function () {
-            });
-        }, function (err) {
-            console.log(err);
-            _this.loading = false;
-        }, function () {
-        });
     };
     LoginPage.prototype.register = function () {
         if (!this.data.userName) {
             this.utility.presentAlert("Please enter Username!");
             return;
         }
-        this.analyzeFace();
+        this.setAndGet.UserName = this.data.userName;
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_6__face_login_face_login__["a" /* FaceLoginPage */]);
     };
     LoginPage.prototype.verifyIfFirstTimeLogin = function () {
-        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_8__face_login_face_login__["a" /* FaceLoginPage */]);
-    };
-    LoginPage.prototype.navigateToDashBoard = function () {
-        this.setAndGet.UserName = this.data.userName;
-        this.navCtrl.setRoot('DashboardPage');
+        if (!sessionStorage.getItem('faceId1')) {
+            this.utility.presentAlert('User not found.');
+        }
+        else {
+            this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_6__face_login_face_login__["a" /* FaceLoginPage */]);
+        }
     };
     LoginPage = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-loginpage',template:/*ion-inline-start:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/'<ion-header>\n\n\n\n</ion-header>\n\n\n\n<ion-content padding style="background-color:silver" >\n\n\n\n  <h1>Face Auth <br> Demo App</h1>\n\n  <div class="container">\n\n    <ion-spinner *ngIf="loading" name="dots"></ion-spinner>\n\n    <div *ngIf="error" class="error">\n\n      {{ error }}\n\n    </div>\n\n  </div>\n\n\n\n  <form >\n\n    <div class="container">\n\n      <label><b>Username</b></label>\n\n      <input type="text" placeholder="Enter Username" name="uname" [(ngModel)]="data.userName" required>\n\n\n\n      <button type="submit" (tap)="login();" >Login</button>\n\n      <label>\n\n        <input type="checkbox" checked="checked"> Remember me\n\n      </label>\n\n      <button type="submit" (tap)="register();" >Sign up</button>\n\n    </div>\n\n  </form>\n\n</ion-content>\n\n'/*ion-inline-end:"D:\Source Codes\Ionic\FaceAuth\src\pages\loginpage\loginpage.html"*/,
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_utility_utility__["a" /* UtilityProvider */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_camera__["a" /* Camera */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["i" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _f || Object])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__providers_utility_utility__["a" /* UtilityProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__providers_utility_utility__["a" /* UtilityProvider */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__providers_settersandgetters_settersandgetters__["a" /* SettersandgettersProvider */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_5__providers_services_request_handler_service__["a" /* ServiceRequest */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__providers_services_request_handler_service__["a" /* ServiceRequest */]) === "function" && _e || Object])
     ], LoginPage);
     return LoginPage;
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e;
 }());
 
 //# sourceMappingURL=loginpage.js.map

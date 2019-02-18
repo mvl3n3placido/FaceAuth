@@ -25678,6 +25678,11 @@ html, body, ion-app, ion-content, ion-page, .nav-decor {
   background-color: transparent !important;
 }
 
+page-face-login ion-spinner {
+  display: block;
+  margin: auto;
+}
+
 page-loginpage {
   /* Bordered form */
   /* Full-width inputs */
